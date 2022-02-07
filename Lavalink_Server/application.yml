@@ -1,0 +1,46 @@
+server:
+  port: 2333
+  address: 0.0.0.0
+spring:
+  main:
+    banner-mode: 
+lavalink:
+  server:
+    password: youshallnotpass
+    sources:
+      youtube: true
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      mixer: true
+      http: true
+      local: false
+    bufferDurationMs: 400
+    youtubePlaylistLoadLimit: 3
+    youtubeSearchEnabled: true
+    soundcloudSearchEnabled: true
+    gc-warnings: true
+metrics:
+  prometheus:
+    enabled: false
+    endpoint: /metrics
+
+sentry:
+  dsn: ""
+
+logging:
+  file:
+    max-history: 1
+    max-size: 3MB
+  path: /app/logs/
+
+plugins:
+  spotify:
+    clientId: "fc9db120a4c64091b3211dd8e626cc6b"
+    clientSecret: "fe0fb4c1daa140e8b15c64c10ee037e0"
+    countryCode: "RU" # the country code you want to use for filtering the artists top tracks. See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+    providers: # Custom providers for track loading. This is the default
+        - "ytsearch:\"%ISRC%\"" # Will be ignored if track does not have an ISRC. See https://en.wikipedia.org/wiki/International_Standard_Recording_Code
+        - "ytsearch:%QUERY%" # Will be used if track has no ISRC or no track could be found for the ISRC
+        #- "scsearch:%QUERY%" you can add multiple other fallback sources here

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "60ed8761-ebcc-45ed-a7a2-8fe9e6b228a1": {
+      "ProjectGuid": "60ed8761-ebcc-45ed-a7a2-8fe9e6b228a1",
+      "DisplayName": "SharkBot",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

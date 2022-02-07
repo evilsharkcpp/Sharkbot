@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="3.2.1" />
+    <PackageReference Include="Discord.Net.Commands" Version="3.2.1" />
+    <PackageReference Include="Discord.Net.Core" Version="3.2.1" />
+    <PackageReference Include="Discord.Net.Interactions" Version="3.2.1" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="3.2.1" />
+    <PackageReference Include="Lavalink.NET" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="SpotifyAPI.Web" Version="6.2.2" />
+    <PackageReference Include="SpotifyAPI.Web.Auth" Version="6.2.2" />
+    <PackageReference Include="Victoria" Version="5.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+
+</Project>
