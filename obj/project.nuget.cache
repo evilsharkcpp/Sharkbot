@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CDoGF52iQTf5WxHvUe2psCftAnavHjFWoSoX0X/JgVjIea+HELyi3ZecEUjf8vdTLC9vA+0j819dmBK7D/1M4Q==",
+  "dgSpecHash": "FFvB/Mlufj9ZhXNG98vZvbBCMhLWHahe++4PsC9GNGgQCaOS8EQWGQ1NrfyM9fv6L6RwzXB18m+Pphb+M73iPA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\asaul\\source\\repos\\SharkBot\\SharkBot.csproj",
+  "projectFilePath": "C:\\Users\\asaul\\Source\\Repos\\Sharkbot\\SharkBot.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\asaul\\.nuget\\packages\\discord.net\\3.2.1\\discord.net.3.2.1.nupkg.sha512",
     "C:\\Users\\asaul\\.nuget\\packages\\discord.net.commands\\3.2.1\\discord.net.commands.3.2.1.nupkg.sha512",

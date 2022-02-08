@@ -38,20 +38,22 @@ namespace SharkBot.Sevices
             newTask.Start();
         }
 
-        private async Task GuildAvailable(SocketGuild arg)
+        private Task GuildAvailable(SocketGuild arg)
         {
             if (!_configService.guildSetups.ContainsKey(arg.Id))
             {
                 _configService.guildSetups.Add(arg.Id, new GuildSetup($"{arg.Id}.json"));
             }
+            return Task.CompletedTask;
         }
 
-        private async Task JoinedGuildAsync(SocketGuild arg)
+        private Task JoinedGuildAsync(SocketGuild arg)
         {
             if (!_configService.guildSetups.ContainsKey(arg.Id))
             {
                 _configService.guildSetups.Add(arg.Id, new GuildSetup($"{arg.Id}.json"));
             }
+            return Task.CompletedTask;
         }
 
         public async Task RunBotAsync()
@@ -92,9 +94,6 @@ namespace SharkBot.Sevices
             await client.LoginAsync(TokenType.Bot, _configService.botSetup.Config.Token);
 
             await client.StartAsync();
-            //Thread time = new Thread(CheckTime);
-            //time.IsBackground = true;
-            //time.Start();
             Thread thread = new Thread(Exit);
             thread.Start();
 
@@ -112,8 +111,13 @@ namespace SharkBot.Sevices
                     {
                         var guild = client.GetGuild(item.Key);
                         var user = guild.GetUser(i.Id);
-                        await user.RemoveRoleAsync(item.Value.Config.MutedRoleId);
-                        i.TimeEnded = DateTime.MaxValue;
+
+                        if (user != null && guild != null)
+                        {
+                            if (guild.CurrentUser.Hierarchy > user.Hierarchy)
+                            await user.RemoveRoleAsync(item.Value.Config.MutedRoleId);
+                            i.TimeEnded = DateTime.MaxValue;
+                        }
                     }
                 }
             }
@@ -141,33 +145,45 @@ namespace SharkBot.Sevices
                         if (i.Id == msg.Author.Id)
                         {
                             i.ViolationCount++;
+                            var user = guild.GetUser(msg.Author.Id);
+                            if (user == null)
+                            {
+                                await guild.DefaultChannel.SendMessageAsync("User not found");
+                                return;
+                            }
                             if (i.ViolationCount > 4)
                             {
-                                var user = client.GetGuild(guildId).GetUser(msg.Author.Id);
-                                if (!client.GetGuild(guildId).GetUser(client.CurrentUser.Id).GuildPermissions.BanMembers)
+                                
+                                if (!guild.CurrentUser.GuildPermissions.BanMembers)
                                 {
-                                    await client.GetGuild(guildId).DefaultChannel.SendMessageAsync($"Нету прав на Бан, епт");
+                                    await guild.DefaultChannel.SendMessageAsync($"I can't ban User, no have permission");
+                                    return;
+                                }
+                                if (guild.CurrentUser.Hierarchy < user.Hierarchy)
+                                {
+                                    await guild.DefaultChannel.SendMessageAsync($"My hierarchy lower that user");
                                     return;
                                 }
                                 await user.BanAsync();
-                                await client.GetGuild(guildId).DefaultChannel.SendMessageAsync($"{msg.Author.Username} Не матерись епт");
+                                await guild.DefaultChannel.SendMessageAsync($"{msg.Author.Username} no swear");
                             }
                             if (i.ViolationCount > 3)
                             {
-                                var user = client.GetGuild(guildId).GetUser(msg.Author.Id);
-                                if (!client.GetGuild(guildId).GetUser(client.CurrentUser.Id).GuildPermissions.KickMembers)
+                                if (!guild.CurrentUser.GuildPermissions.KickMembers)
                                 {
-                                    await client.GetGuild(guildId).DefaultChannel.SendMessageAsync($"Нету прав на кик, епт");
+                                    await guild.DefaultChannel.SendMessageAsync($"I can't kick User, no have permission");
                                     return;
                                 }
-                                await user.KickAsync("Нужно меньше материться, иначе бан получишь)");
-                                await client.GetGuild(guildId).DefaultChannel.SendMessageAsync($"{msg.Author.Username} Не матерись епт");
+                                await user.KickAsync("No swear!!!!");
                             }
                             if (i.ViolationCount > 0)
-                            {
-                                var user = guild.GetUser(i.Id);
-                                i.Type = "Mute";
+                            { 
                                 i.TimeEnded = DateTime.Now.AddMinutes(i.ViolationCount * 30);
+                                if (guild.GetRole(_configService.guildSetups[guildId].Config.MutedRoleId) == null)
+                                {
+                                    await guild.DefaultChannel.SendMessageAsync("Muted role don't exist or found");
+                                    return;
+                                }
                                 if (guild.CurrentUser.Hierarchy > user.Hierarchy && guild.GetRole(_configService.guildSetups[guildId].Config.MutedRoleId).Position < guild.CurrentUser.Hierarchy)
                                     await guild.GetUser(i.Id).AddRoleAsync(guild.GetRole(_configService.guildSetups[guildId].Config.MutedRoleId));
                                 else

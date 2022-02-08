@@ -10,7 +10,6 @@ namespace SharkBot.Data
     {
         public ulong Id { get; set; }
         public ulong ViolationCount { get; set; } = 0;
-        public string Type { get; set; } = string.Empty;
         public DateTime TimeEnded { get; set; } = DateTime.MaxValue;
         public UserInfo(ulong Id)
         {

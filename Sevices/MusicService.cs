@@ -20,6 +20,7 @@ namespace SharkBot.Services
         // Add check null + Exceptions
         private readonly LavaNode _lavaNode;
         static public Dictionary<ulong, Queue<Track>> queue = new Dictionary<ulong, Queue<Track>>();
+        SocketUserMessage messagePlayer;
         public MusicService(LavaNode lavaNode)
         {
             _lavaNode = lavaNode;
