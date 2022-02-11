@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using SharkBot.Sevices;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,19 @@ namespace SharkBot.Commands
     public class ServerCommands:ModuleBase<SocketCommandContext>
     {
         readonly ServerService serverService;
+        [Command("Profile")]
+        public async Task GetProfileAsync()
+        {
+            await serverService.GetProfile(Context.Guild, Context.User.Id, Context.Channel as ITextChannel);
+        }
         public ServerCommands(ServerService service) => serverService = service;
-        [Command("set_prefix")]
+        [Command("AddBadWord")]
+        public async Task AddBadWord(string badWord)
+        {
+            serverService.AddBadWord(Context.Guild.Id, badWord);
+            await ReplyAsync("Word added in list of forbidden words");
+        }
+        [Command("SetPrefix")]
         public async Task SetPrefixAsync(string prefix)
         {
             try
@@ -26,7 +38,7 @@ namespace SharkBot.Commands
                 await DiscordService.Log(new Discord.LogMessage(Discord.LogSeverity.Error, "Bot", ex.Message));
             }
         }
-        [Command("set_std_role")]
+        [Command("SetStdRole")]
         public async Task SetStdRoleAsync(string roleName)
         {
             var Roles = Context.Guild.Roles;
@@ -42,6 +54,19 @@ namespace SharkBot.Commands
                 }
             }
             await ReplyAsync("Role not found");
+        }
+        [Command("SetMutedRole")]
+        public async Task SetMutedRoleAsync(string roleName)
+        {
+            var Roles = Context.Guild.Roles;
+            foreach (var item in Roles)
+                if(item.Name == "Muted" || item.Name == roleName)
+                {
+                    await ReplyAsync($"`Muted role set`");
+                    serverService.SetMutedRoleAsync(Context.Guild.Id, item.Id);
+                    return;
+                }
+            await ReplyAsync("`Role not found`");
         }
         [Command("get_roleId")]
         public async Task GetRoleIdAsync(string roleName)

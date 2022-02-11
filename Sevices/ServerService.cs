@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Discord;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using static SharkBot.Templates;
 namespace SharkBot.Sevices
 {
     public class ServerService
@@ -22,6 +23,35 @@ namespace SharkBot.Sevices
         {
             _configService.guildSetups[guildId].Config.StdRole = roleId;
             SaveConfig(guildId);
+        }
+        public void SetMutedRoleAsync(ulong guildId, ulong roleId)
+        {
+            _configService.guildSetups[guildId].Config.MutedRoleId = roleId;
+            SaveConfig(guildId);
+        }
+        public void AddBadWord(ulong guildId, string badWord)
+        {
+            var words = new List<string>() {};
+            words.AddRange(_configService.guildSetups[guildId].Config.WrongWords);
+            words.Add(badWord);
+            _configService.guildSetups[guildId].Config.WrongWords = words.ToArray();
+            SaveConfig(guildId);
+        }
+        public async Task GetProfile(IGuild guild, ulong userId, ITextChannel textChannel)
+        {
+            var guildId = guild.Id;
+            var user = await guild.GetUserAsync(userId);
+            if (user == null) return;
+            DateTime endedTime = DateTime.MaxValue;
+            foreach (var item in _configService.guildSetups[guildId].users)
+            {
+                if(item.Id == user.Id)
+                {
+                    endedTime = item.TimeEnded;
+                }
+            }
+            await textChannel.SendMessageAsync(embed: GetUserProfile(user,endedTime));
+
         }
         public void SaveConfig(ulong guildId)
         {

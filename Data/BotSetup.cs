@@ -11,7 +11,7 @@ namespace SharkBot.Data
 {
     public class BotSetup
     {
-        public BotConfig Config { get; set; }
+        public static BotConfig Config { get; set; }
         public static string BotPath { get; set; } = "config.json";
         public void InitAsync()
         {

@@ -1,21 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\asaul\\Source\\Repos\\Sharkbot\\SharkBot.csproj": {}
+    "C:\\Users\\asaul\\Documents\\GitHub\\SharkBot\\SharkBot.csproj": {}
   },
   "projects": {
-    "C:\\Users\\asaul\\Source\\Repos\\Sharkbot\\SharkBot.csproj": {
+    "C:\\Users\\asaul\\Documents\\GitHub\\SharkBot\\SharkBot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\asaul\\Source\\Repos\\Sharkbot\\SharkBot.csproj",
+        "projectUniqueName": "C:\\Users\\asaul\\Documents\\GitHub\\SharkBot\\SharkBot.csproj",
         "projectName": "SharkBot",
-        "projectPath": "C:\\Users\\asaul\\Source\\Repos\\Sharkbot\\SharkBot.csproj",
+        "projectPath": "C:\\Users\\asaul\\Documents\\GitHub\\SharkBot\\SharkBot.csproj",
         "packagesPath": "C:\\Users\\asaul\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\asaul\\Source\\Repos\\Sharkbot\\obj\\",
+        "outputPath": "C:\\Users\\asaul\\Documents\\GitHub\\SharkBot\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
           "C:\\Users\\asaul\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
@@ -104,7 +108,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -19,8 +19,8 @@ namespace SharkBot.Services
     {
         // Add check null + Exceptions
         private readonly LavaNode _lavaNode;
-        static public Dictionary<ulong, Queue<Track>> queue = new Dictionary<ulong, Queue<Track>>();
-        SocketUserMessage messagePlayer;
+        static private Dictionary<ulong, Queue<Track>> TrackQueue = new Dictionary<ulong, Queue<Track>>();
+        static private Dictionary<ulong, IUserMessage> PlayerMessage = new Dictionary<ulong, IUserMessage>();
         public MusicService(LavaNode lavaNode)
         {
             _lavaNode = lavaNode;
@@ -28,7 +28,7 @@ namespace SharkBot.Services
         public void InitEvents()
         {
             _lavaNode.OnTrackEnded += OnTrackEnded;
-            //_lavaNode.OnTrackStarted += OnTrackStarted;
+            _lavaNode.OnTrackStarted += OnTrackStarted;
             _lavaNode.OnTrackException += OnTrackExeption;
         }
 
@@ -36,18 +36,20 @@ namespace SharkBot.Services
         {
             var player = arg.Player;
             var guildId = player.VoiceChannel.GuildId;
-            await player.TextChannel.SendMessageAsync(null, false, TemplateMessage("`Track unsupported`", "Player"));
-            if (queue[guildId].Count == 0)
+            var messagePlayer = PlayerMessage[guildId];
+            if (messagePlayer == null) await player.TextChannel.SendMessageAsync(null, false, Player("`Track unsupported`"));
+            else await messagePlayer.ModifyAsync(messagePlayer => messagePlayer.Embed = Player("`Track unsupported`"));
+            if (TrackQueue[guildId].Count == 0)
             {
-                await player.TextChannel.SendMessageAsync(null, false, TemplateMessage("`There are no more tracks in the queue.`"));
+                if (messagePlayer == null) await player.TextChannel.SendMessageAsync(null, false, Player("`There are no more tracks in the queue.`"));
+                else await messagePlayer.ModifyAsync(messagePlayer => messagePlayer.Embed = Player("`There are no more tracks in the queue.`"));
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
                 return;
             }
-            var track = queue[guildId].Dequeue();
+            var track = TrackQueue[guildId].Dequeue();
             if (track.LavaTrack == null)
                 track = await GetTrackAsync("", track);
 
-            await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"Now Playing: `{track.Artist} {track.Name}`\n Tracks in queue: {queue[guildId].Count}", "Player"));
             await player.PlayAsync(track.LavaTrack);
         }
 
@@ -57,24 +59,28 @@ namespace SharkBot.Services
             if (args.Reason != TrackEndReason.Finished) return;
             var player = args.Player;
             var guildId = player.VoiceChannel.GuildId;
-            if (queue[guildId].Count == 0)
+            var messagePlayer = PlayerMessage[guildId];
+            if (TrackQueue[guildId].Count == 0)
             {
-                await player.TextChannel.SendMessageAsync(null, false, TemplateMessage("`There are no more tracks in the queue.`"));
+                if (messagePlayer == null) await player.TextChannel.SendMessageAsync(null, false, Player("`There are no more tracks in the queue.`"));
+                else await messagePlayer.ModifyAsync(messagePlayer => messagePlayer.Embed = Player("`There are no more tracks in the queue.`"));
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
                 return;
             }
-            var track = queue[guildId].Dequeue();
+            var track = TrackQueue[guildId].Dequeue();
             if (track.LavaTrack == null)
                 track = await GetTrackAsync("", track);
-
-            await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"Now Playing: `{track.Artist} {track.Name}`\n Tracks in queue: {queue[guildId].Count}", "Player"));
             await player.PlayAsync(track.LavaTrack);
         }
         public async Task OnTrackStarted(TrackStartEventArgs args)
         {
             var player = args.Player;
             var playerQueue = player.Queue;
-            //await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"Now Playing: `{args.Track.Title}`\n Tracks in queue: {playerQueue.Count + queue[player.VoiceChannel.GuildId].Count}", "Player"));
+            var guildId = player.VoiceChannel.GuildId;
+            var messagePlayer = PlayerMessage[guildId];
+            var track = player.Track;
+            if (messagePlayer == null) PlayerMessage[guildId] = await player.TextChannel.SendMessageAsync(null, false, Player($"Now Playing: `{track.Title}`\n Tracks in queue: {TrackQueue[guildId].Count}"));
+            else await messagePlayer.ModifyAsync(messagePlayer => messagePlayer.Embed = Player($"Now Playing: `{track.Title}`\n Tracks in queue: {TrackQueue[guildId].Count}"));
         }
         //Commands
         public async Task ListAsync(IGuild guildId)
@@ -87,13 +93,16 @@ namespace SharkBot.Services
                 tmp += index++.ToString() + ") " + item.Title + "\n";
             }
             tmp += "...\n";
-            await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"{tmp}Total Count: {player.Queue.Count + queue[guildId.Id].Count}", "Player"));
+            await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"{tmp}Total Count: {player.Queue.Count + TrackQueue[guildId.Id].Count}", "Player"));
         }
         public async Task PlayAsync(string query, IGuild guildId)
         {
             var player = _lavaNode.GetPlayer(guildId);
-            if (queue.ContainsKey(guildId.Id) == false)
-                queue.Add(guildId.Id, new Queue<Track>());
+            if (PlayerMessage.ContainsKey(guildId.Id) == false)
+                PlayerMessage.Add(guildId.Id, null);
+            var messagePlayer = PlayerMessage[guildId.Id];
+            if (TrackQueue.ContainsKey(guildId.Id) == false)
+                TrackQueue.Add(guildId.Id, new Queue<Track>());
             if (player.PlayerState == PlayerState.Paused)
             {
                 await player.ResumeAsync();
@@ -107,16 +116,14 @@ namespace SharkBot.Services
                 if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
                 {
                     for (var i = 0; i < parsed.Count; i++)
-                        if (i == 0) queue[guildId.Id].Enqueue(track);
-                        else queue[guildId.Id].Enqueue(parsed[i]);
+                        if (i == 0) TrackQueue[guildId.Id].Enqueue(track);
+                        else TrackQueue[guildId.Id].Enqueue(parsed[i]);
                     await player.TextChannel.SendMessageAsync(null, false, TemplateMessage("`Tracks added in queue`", "Player"));
                 }
                 else
                 {
                     for (var i = 1; i < parsed.Count; i++)
-                        queue[guildId.Id].Enqueue(parsed[i]);
-                    if (parsed.Count > 1) await player.TextChannel.SendMessageAsync(null, false, TemplateMessage("`Tracks added in queue`", "Player"));
-                    await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"Now Playing: `{track.Artist} {track.Name}`\n Tracks in queue: {queue[guildId.Id].Count}", "Player"));
+                        TrackQueue[guildId.Id].Enqueue(parsed[i]);
                     await player.PlayAsync(track.LavaTrack);
                 }
             }
@@ -125,12 +132,11 @@ namespace SharkBot.Services
                 var track = await GetTrackAsync(query);
                 if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
                 {
-                    queue[guildId.Id].Enqueue(track);
+                    TrackQueue[guildId.Id].Enqueue(track);
                     await player.TextChannel.SendMessageAsync(null, false, TemplateMessage("`Track added in queue`", "Player"));
                 }
                 else
                 {
-                    await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"Now Playing: `{track.Artist} {track.Name}`\n Tracks in queue: {queue[guildId.Id].Count}", "Player"));
                     await player.PlayAsync(track.LavaTrack);
                 }
             }
@@ -158,19 +164,19 @@ namespace SharkBot.Services
         public async Task LeaveAsync(IGuild guildId)
         {
             var player = _lavaNode.GetPlayer(guildId);
-            queue.Remove(guildId.Id);
+            TrackQueue.Remove(guildId.Id);
             await _lavaNode.LeaveAsync(player.VoiceChannel);
         }
         public async Task NextAsync(IGuild guildId)
         {
             var player = _lavaNode.GetPlayer(guildId);
-            if (player != null && queue[guildId.Id].Count > 0)
+            var messagePlayer = PlayerMessage[guildId.Id];
+            if (player != null && TrackQueue[guildId.Id].Count > 0)
             {
-                var track = queue[guildId.Id].Dequeue();
+                var track = TrackQueue[guildId.Id].Dequeue();
                 if (track.LavaTrack == null)
                     track = await GetTrackAsync("", track);
                 await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"`Track` skipped", "Player"));
-                await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"Now Playing: `{track.Artist} {track.Name}`\n Tracks in queue: {queue[guildId.Id].Count}", "Player"));
                 await player.PlayAsync(track.LavaTrack);
             }
         }

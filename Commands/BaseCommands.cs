@@ -11,6 +11,17 @@ namespace SharkBot.Commands
 {
     public sealed class BaseCommands : ModuleBase<SocketCommandContext>
     {
+       
+        [Command("Info")]
+        public async Task GetInfoAsync()
+        {
+            if (Context.User != Context.Guild.Owner) return;
+            await Context.User.SendMessageAsync("Commands:\n" +
+                "1) <Prefix>SetPrefix - Set new prefix\n" +
+                "2) <Prefix>SetStdRole - Set standart role for new users\n" +
+                "3) <Prefix>SetMutedRole - Set Muted role for mute users"
+                 );
+        }
         [Command("AddRole")]
         public async Task AddRoleAsync(string RoleName)
         {

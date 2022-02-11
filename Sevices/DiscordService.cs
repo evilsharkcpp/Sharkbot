@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Victoria;
-
+using static SharkBot.Templates;
 namespace SharkBot.Sevices
 {
     class DiscordService
@@ -30,6 +30,7 @@ namespace SharkBot.Sevices
             client.Log += Log;
             client.MessageReceived += HandleCommandAsync;
             client.Ready += OnReadyAsync;
+            client.SetGameAsync(BotSetup.Config.GameStatus);
             client.UserJoined += UserJoinedAsync;
             client.JoinedGuild += JoinedGuildAsync;
             //client.GuildMembersDownloaded += GuildMembersDownloaded;
@@ -91,7 +92,7 @@ namespace SharkBot.Sevices
                 .BuildServiceProvider();
             InitEvents();
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await client.LoginAsync(TokenType.Bot, _configService.botSetup.Config.Token);
+            await client.LoginAsync(TokenType.Bot, BotSetup.Config.Token);
 
             await client.StartAsync();
             Thread thread = new Thread(Exit);
@@ -156,7 +157,7 @@ namespace SharkBot.Sevices
                                 
                                 if (!guild.CurrentUser.GuildPermissions.BanMembers)
                                 {
-                                    await guild.DefaultChannel.SendMessageAsync($"I can't ban User, no have permission");
+                                    await guild.DefaultChannel.SendMessageAsync($"I can't ban User({user.Username}), no have permission");
                                     return;
                                 }
                                 if (guild.CurrentUser.Hierarchy < user.Hierarchy)
@@ -164,14 +165,14 @@ namespace SharkBot.Sevices
                                     await guild.DefaultChannel.SendMessageAsync($"My hierarchy lower that user");
                                     return;
                                 }
-                                await user.BanAsync();
-                                await guild.DefaultChannel.SendMessageAsync($"{msg.Author.Username} no swear");
+                                await user.BanAsync(Convert.ToInt32(i.ViolationCount));
+                                await guild.DefaultChannel.SendMessageAsync($"{msg.Author.Username} no swear, I ban you now");
                             }
                             if (i.ViolationCount > 3)
                             {
                                 if (!guild.CurrentUser.GuildPermissions.KickMembers)
                                 {
-                                    await guild.DefaultChannel.SendMessageAsync($"I can't kick User, no have permission");
+                                    await guild.DefaultChannel.SendMessageAsync($"I can't kick User({user.Username}), no have permission");
                                     return;
                                 }
                                 await user.KickAsync("No swear!!!!");
@@ -185,9 +186,12 @@ namespace SharkBot.Sevices
                                     return;
                                 }
                                 if (guild.CurrentUser.Hierarchy > user.Hierarchy && guild.GetRole(_configService.guildSetups[guildId].Config.MutedRoleId).Position < guild.CurrentUser.Hierarchy)
+                                {
                                     await guild.GetUser(i.Id).AddRoleAsync(guild.GetRole(_configService.guildSetups[guildId].Config.MutedRoleId));
+                                    await guild.DefaultChannel.SendMessageAsync(embed: GetUserProfile(guild.GetUser(i.Id), i.TimeEnded));
+                                }
                                 else
-                                    await guild.DefaultChannel.SendMessageAsync("My role hierarchy lower that Muted role or User Hierarchy higher that me");
+                                    await guild.DefaultChannel.SendMessageAsync($"My role hierarchy lower that Muted role or User({user.Username}) Hierarchy higher that me");
                             }
 
                         }
@@ -221,7 +225,7 @@ namespace SharkBot.Sevices
             else
             {
                 _configService.guildSetups.Add(context.Guild.Id, new GuildSetup($"{context.Guild.Id}.json"));
-                Prefix = _configService.botSetup.Config.Prefix;
+                Prefix = BotSetup.Config.Prefix;
             }
             int argPos = 0;
             await Filter(message, context.Guild.Id);

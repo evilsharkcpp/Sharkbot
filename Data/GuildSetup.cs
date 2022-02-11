@@ -30,9 +30,9 @@ namespace SharkBot.Data
 
         private GuildConfig GenerateNewConfig => new GuildConfig
         {
-            Prefix = "#",
+            Prefix = BotSetup.Config.Prefix,
             StdRole = 0,
-            WrongWords = new string[] { "Блять", "Пидр"},
+            WrongWords = new string[] { },
             MutedRoleId = 0
         };
     }
