@@ -13,10 +13,13 @@ namespace SharkBot.Sevices
     {
         ConfigService _configService;
         public ServerService(ConfigService configService) => _configService = configService;
-
-        public void SetPrefixAsync(ulong guildId, string NewPrefix)
+        public string GetCurrectPrefix(ulong guildId)
         {
-            _configService.guildSetups[guildId].Config.Prefix = NewPrefix;
+            return _configService.guildSetups[guildId].Config.Prefix;
+        }
+        public void SetPrefixAsync(ulong guildId, string newPrefix)
+        {
+            _configService.guildSetups[guildId].Config.Prefix = newPrefix;
             SaveConfig(guildId);
         }
         public void SetStdRoleAsync(ulong guildId, ulong roleId)

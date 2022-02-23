@@ -12,6 +12,11 @@ namespace SharkBot.Commands
     public class ServerCommands:ModuleBase<SocketCommandContext>
     {
         readonly ServerService serverService;
+        [Command("CurrectPrefix")]
+        public async Task GetCurrectPrefixAsync()
+        {
+            await ReplyAsync($"Currect prefix: `{serverService.GetCurrectPrefix(Context.Guild.Id)}`");
+        }
         [Command("Profile")]
         public async Task GetProfileAsync()
         {
@@ -21,6 +26,7 @@ namespace SharkBot.Commands
         [Command("AddBadWord")]
         public async Task AddBadWord(string badWord)
         {
+            if (Context.User != Context.Guild.Owner) return;
             serverService.AddBadWord(Context.Guild.Id, badWord);
             await ReplyAsync("Word added in list of forbidden words");
         }
@@ -29,6 +35,7 @@ namespace SharkBot.Commands
         {
             try
             {
+                if (Context.User != Context.Guild.Owner) return;
                 serverService.SetPrefixAsync(Context.Guild.Id, prefix);
                 await ReplyAsync("`Prefix changed`");
             }
@@ -41,6 +48,7 @@ namespace SharkBot.Commands
         [Command("SetStdRole")]
         public async Task SetStdRoleAsync(string roleName)
         {
+            if (Context.User != Context.Guild.Owner) return;
             var Roles = Context.Guild.Roles;
             ulong roleId;
             foreach (var item in Roles)
@@ -58,6 +66,7 @@ namespace SharkBot.Commands
         [Command("SetMutedRole")]
         public async Task SetMutedRoleAsync(string roleName)
         {
+            if (Context.User != Context.Guild.Owner) return;
             var Roles = Context.Guild.Roles;
             foreach (var item in Roles)
                 if(item.Name == "Muted" || item.Name == roleName)
@@ -71,6 +80,7 @@ namespace SharkBot.Commands
         [Command("get_roleId")]
         public async Task GetRoleIdAsync(string roleName)
         {
+            if (Context.User != Context.Guild.Owner) return;
             var Roles = Context.Guild.Roles;
             ulong roleId;
             foreach (var item in Roles)
@@ -87,6 +97,7 @@ namespace SharkBot.Commands
         [Command("set_roleId")]
         public async Task SetRoleIdAsync(string userName, string roleName)
         {
+            if (Context.User != Context.Guild.Owner) return;
             var Roles = Context.Guild.Roles;
             var Users = Context.Guild.Users;
             ulong roleId;

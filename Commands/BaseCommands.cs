@@ -39,17 +39,17 @@ namespace SharkBot.Commands
         {
             await ReplyAsync($"`Suka blyat`");
         }
-        [Command("help")]
+        [Command("Help")]
         public async Task HelpAsync()
         {
             await ReplyAsync(null,false,Templates.TemplateMessage($"Available commands:\n" +
-                $"1)!play\n" +
-                $"2)!join\n" +
-                $"3)!leave\n" +
-                $"4)!pause\n" +
-                $"5)!stop\n" +
-                $"6)!next\n" +
-                $"7)!resume\n"));
+                $"1)Play\n" +
+                $"2)Join\n" +
+                $"3)Leave\n" +
+                $"4)Pause\n" +
+                $"5)Stop\n" +
+                $"6)Next\n" +
+                $"7)Resume\n"));
         }
         //[Command("find")]
         public IGuildUser FindAsync(string name)

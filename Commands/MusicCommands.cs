@@ -16,7 +16,7 @@ namespace SharkBot.Commands
             _lavaNode = lavaNode;
             _musicService = new MusicService(_lavaNode);
         }
-        [Command("join")]
+        [Command("Join")]
         public async Task JoinAsync()
         {
             if (_lavaNode.HasPlayer(Context.Guild))
@@ -42,24 +42,24 @@ namespace SharkBot.Commands
                 await Context.Channel.SendMessageAsync(exception.Message);
             }
         }
-        [Command("leave")]
+        [Command("Leave")]
         public async Task LeaveAsync() => await _musicService.LeaveAsync(Context.Guild);
-        [Command("play")]
-        [Alias("resume")]
+        [Command("Play")]
+        [Alias("Resume")]
         public async Task PlayAsync([Remainder] string query = null)
         {
             if (!_lavaNode.HasPlayer(Context.Guild)) await JoinAsync();
             await _musicService.PlayAsync(query, Context.Guild);
         }
-        [Command("pause")]
+        [Command("Pause")]
         public async Task PauseAsync() => await _musicService.PauseAsync(Context.Guild);
-        [Command("stop")]
+        [Command("Stop")]
         public async Task StopAsync() => await _musicService.StopAsync(Context.Guild);
-        [Command("next")]
+        [Command("Next")]
         public async Task NextAsync() => await _musicService.NextAsync(Context.Guild);
-        [Command("list")]
+        [Command("List")]
         public async Task ListAsync() => await _musicService.ListAsync(Context.Guild);
-        [Command("volume")]
+        [Command("Volume")]
         public async Task VolumeAsync(ushort volume) => await _musicService.SetVolumeAsync(volume, Context.Guild);
     }
 }
