@@ -3,3 +3,4 @@ Guilds/
 *.json
 *.yml
 Lavalink_Server/
+bin/
