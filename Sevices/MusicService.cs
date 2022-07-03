@@ -88,11 +88,11 @@ namespace SharkBot.Services
             var player = _lavaNode.GetPlayer(guildId);
             string tmp = "";
             int index = 1;
-            foreach (var item in player.Queue)
+            var queue = TrackQueue[guildId.Id];
+            foreach (var item in queue)
             {
-                tmp += index++.ToString() + ") " + item.Title + "\n";
+                tmp += $"{index++}) {item.Artist} {item.Name}\n";
             }
-            tmp += "...\n";
             await player.TextChannel.SendMessageAsync(null, false, TemplateMessage($"{tmp}Total Count: {player.Queue.Count + TrackQueue[guildId.Id].Count}", "Player"));
         }
         public async Task PlayAsync(string query, IGuild guildId)

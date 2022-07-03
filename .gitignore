@@ -1,6 +1,6 @@
 Guilds/
 *.json
-*.json
+*.txt
 *.yml
 Lavalink_Server/
 bin/

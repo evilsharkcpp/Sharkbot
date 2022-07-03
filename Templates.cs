@@ -18,7 +18,7 @@ namespace SharkBot
             embedBuilder.AddField("MutedTime", time == DateTime.MaxValue ? "No mute" : time.ToString());
             return embedBuilder.Build();
         }
-        public static Embed Player(string text)
+        public static Embed Player(string text, string time = null)
         {
             var embedMessage = new EmbedBuilder();
             embedMessage.Color = Color.Blue;

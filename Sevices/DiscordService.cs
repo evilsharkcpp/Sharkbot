@@ -127,7 +127,7 @@ namespace SharkBot.Sevices
         }
         public void Exit()
         {
-            while (Console.ReadLine() != "exit") ;
+            while (Console.ReadLine().ToLower() != "exit") ;
             _instanceOfLavaNode.DisconnectAsync();
             client.StopAsync();
         }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharkBot.Data;
 using SpotifyAPI.Web;
+using System.IO;
 
 namespace SharkBot
 {
@@ -17,7 +18,9 @@ namespace SharkBot
             var config = SpotifyClientConfig.CreateDefault();
             if (url.Contains("?si="))
                 url = url.Remove(url.IndexOf("?si="));
-            var request = new ClientCredentialsRequest("fc9db120a4c64091b3211dd8e626cc6b", "fe0fb4c1daa140e8b15c64c10ee037e0");
+            // Read Spotify Token
+            var token = File.ReadAllText("spotify.txt");
+            var request = new ClientCredentialsRequest("fc9db120a4c64091b3211dd8e626cc6b",token);
             var response = await new OAuthClient(config).RequestToken(request);
 
             var spotify = new SpotifyClient(config.WithToken(response.AccessToken));

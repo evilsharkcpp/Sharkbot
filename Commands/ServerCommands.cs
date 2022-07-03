@@ -12,6 +12,11 @@ namespace SharkBot.Commands
     public class ServerCommands:ModuleBase<SocketCommandContext>
     {
         readonly ServerService serverService;
+        [Command("GetParams")]
+        public async Task GetParamsAsync()
+        {
+            await ReplyAsync();
+        }
         [Command("CurrectPrefix")]
         public async Task GetCurrectPrefixAsync()
         {
